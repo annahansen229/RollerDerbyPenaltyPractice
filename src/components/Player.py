@@ -13,18 +13,15 @@ class Player(html.Div):
         super().__init__(id=id, hidden=True)
 
         self.video = 'video'
-        self.play_button = 'play_button'
         self.store = store
 
         self.children = [
             dp.DashPlayer(
                 id=self.video,
                 url=None,
-                playing=False
-            ),
-            html.Button(
-                id=self.play_button,
-                children='Play',
+                playing=False,
+                controls=True,
+                intervalCurrentTime=500,
             ),
         ]
 
@@ -32,16 +29,6 @@ class Player(html.Div):
 
     def register_callbacks(self):
         app = get_app()
-
-        app.callback(
-            inputs=dict(
-                playing=Input(self.video, 'playing')
-            ),
-            output=dict(
-                play_button_text=Output(self.play_button, 'children')
-            ),
-            prevent_initial_call=True
-        )(self.get_play_button_text)
 
         app.callback(
             output=dict(
@@ -69,20 +56,6 @@ class Player(html.Div):
             prevent_initial_call=True
         )(self.show_player)
 
-        app.callback(
-            Output(self.video, 'playing', allow_duplicate=True),
-            Input(self.play_button, 'n_clicks'),
-            State(self.video, 'playing'),
-            prevent_initial_call=True
-
-        )(self.on_play_button_click)
-
-    def on_play_button_click(self, _n_clicks, playing,):
-        '''
-            Toggle playing when play button is clicked
-        '''
-        return not playing
-
     def show_player(self, url):
         '''
             When there is no url, stop playing and hide player
@@ -92,11 +65,6 @@ class Player(html.Div):
         return dict(
             hidden=not playing,
             playing=playing,
-        )
-
-    def get_play_button_text(self, playing):
-        return dict(
-            play_button_text='Pause' if playing else 'Resume'
         )
 
     def play_next_video(self, current_time: float, duration: float, store: List[Clip]):
