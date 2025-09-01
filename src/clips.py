@@ -13,7 +13,7 @@ def get_clips() -> List[Clip]:
 
         If the subfolder names are not valid `Format`s or `Category`s, the video is not included in the return value.
     '''
-    all_files = [f for f in Path("src/static/").rglob('*') if f.is_file()]
+    all_files = [f.relative_to('src') for f in Path("src/static/").rglob('*') if f.is_file()]
 
     clips = []
 
@@ -26,12 +26,6 @@ def get_clips() -> List[Clip]:
                 format = None
                 category = None
             else:
-                category_folder_name = f.parent.name
-                print('category_folder_name', category_folder_name)
-
-                format_folder_name = f.parent.parent.name
-                print('format_folder_name', format_folder_name)
-
                 category = Category(f.parent.name)
                 format = Format(f.parent.parent.name)
 

@@ -59,7 +59,7 @@ class Format(StrEnum):
 
     @classmethod
     def label(cls, format: 'Format') -> str:
-        return format.upper()
+        return format.title()
 
     @classmethod
     def get_options(cls, clips: List['Clip']) -> List[Dict[str, str]]:
@@ -85,5 +85,4 @@ class Clip:
     format: Format | None
     category: Category | None
     name: str
-    url: str
     url: str

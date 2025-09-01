@@ -1,4 +1,5 @@
 
+from dataclasses import asdict
 from typing import Dict, List, Union
 
 import dash_player as dp
@@ -68,7 +69,7 @@ def start_button_click(format, categories, options, **kwargs) -> Dict[str, Union
     return dict(
         playing=True,
         url=first_video.url,
-        store=playlist,
+        store=[asdict(clip) for clip in playlist],
         start_button_text='Restart'
     )
 
@@ -92,24 +93,24 @@ def play_next_video(current_time: float, duration: float, store: List[Clip]):
     if current_time == duration:
         # video has reached the end
         try:
-            next_video, *new_playlist = store
+            next_video, *remaining_playlist = [Clip(**dict) for dict in store]
             url = next_video.url
-            store = new_playlist
+            new_playlist = [asdict(clip) for clip in remaining_playlist]
             playing = True
         except ValueError:
             # end of the playlist
             url = None
-            store = []
+            new_playlist = []
             playing = False
     else:
         # video still in progress
         url = no_update
-        store = no_update
+        new_playlist = no_update
         playing = no_update
 
     return dict(
         url=url,
-        store=store,
+        store=new_playlist,
         playing=playing,
     )
 
