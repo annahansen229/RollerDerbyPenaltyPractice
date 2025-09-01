@@ -19,10 +19,13 @@ app.layout = [
     html.Div(
         children='Roller Derby Hand Signals and Verbal Cues Practice',
     ),
-    dcc.RadioItems(
-        id='format',
-        options=Format.get_options(clips),
-        value=Format.get_default_option(),
+    html.Div(
+        dcc.RadioItems(
+            id='format',
+            options=Format.get_options(clips),
+            value=Format.get_default_option(),
+        ),
+        hidden=True
     ),
     dcc.Checklist(
         id='categories',
