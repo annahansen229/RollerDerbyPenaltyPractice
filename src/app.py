@@ -2,6 +2,7 @@
 from dataclasses import asdict
 from typing import Dict, Union
 
+import dash_mantine_components as dmc
 from dash import Dash, Input, Output, State, callback, dcc, html
 
 from src.clips import clips, get_playlist
@@ -14,35 +15,89 @@ app = Dash()
 
 player = Player(id='player', store='store')
 
-app.layout = [
-    dcc.Store(id='store', storage_type='session', data=[]),
-    html.Div(
-        children='Roller Derby Hand Signals and Verbal Cues Practice',
-    ),
-    html.Div(
-        dcc.RadioItems(
-            id='format',
-            options=Format.get_options(clips),
-            value=Format.get_default_option(),
+layout = dmc.AppShell(
+    [
+        dmc.AppShellHeader(
+            dmc.Group(
+                [
+                    dmc.Burger(
+                        id='mobile-burger',
+                        size='sm',
+                        hiddenFrom='sm',
+                        opened=False,
+                    ),
+                    dmc.Burger(
+                        id="desktop-burger",
+                        size="sm",
+                        visibleFrom="sm",
+                        opened=True,
+                    ),
+                    dmc.Title('Roller Derby Hand Signals and Verbal Cues Practice')
+                ],
+                h="100%",
+                px="md",
+            )
         ),
-        hidden=True
-    ),
-    dcc.Checklist(
-        id='categories',
-        options=Category.get_options(clips),
-        value=Category.get_all(),
-    ),
-    dcc.Checklist(
-        id='options',
-        options=Option.all(),
-        value=[],
-    ),
-    html.Button(
-        id='start_button',
-        children='Start'
-    ),
-    player,
-]
+        dmc.AppShellNavbar(
+            id='navbar',
+            children=[
+                html.Div(
+                    dcc.RadioItems(
+                        id='format',
+                        options=Format.get_options(clips),
+                        value=Format.get_default_option(),
+                    ),
+                    hidden=True
+                ),
+                dcc.Checklist(
+                    id='categories',
+                    options=Category.get_options(clips),
+                    value=Category.get_all(),
+                ),
+                dcc.Checklist(
+                    id='options',
+                    options=Option.all(),
+                    value=[],
+                ),
+                html.Button(
+                    id='start_button',
+                    children='Start'
+                ),
+            ],
+            p='md'
+        ),
+        dmc.AppShellMain(
+            player,
+        ),
+    ],
+    header={"height": 60},
+    navbar={
+        "width": 300,
+        "breakpoint": "sm",
+        "collapsed": {"mobile": True, "desktop": False},
+    },
+    padding="md",
+    id="appshell",
+)
+
+app.layout = dmc.MantineProvider([
+    dcc.Store(id='store', storage_type='session', data=[]),
+    layout
+])
+
+
+@callback(
+    Output("appshell", "navbar"),
+    Input("mobile-burger", "opened"),
+    Input("desktop-burger", "opened"),
+    State("appshell", "navbar"),
+)
+def toggle_navbar(mobile_opened, desktop_opened, navbar):
+    navbar["collapsed"] = {
+        "mobile": not mobile_opened,
+        "desktop": not desktop_opened,
+    }
+    return navbar
 
 
 @callback(
