@@ -8,7 +8,7 @@ class Option(StrEnum):
     OUTRO = 'outro'
 
     @classmethod
-    def title(cls, option: 'Option') -> str:
+    def label(cls, option: 'Option') -> str:
         return option.title()
 
     @classmethod
@@ -16,37 +16,47 @@ class Option(StrEnum):
         return [o for o in cls]
 
     @classmethod
-    def options(cls) -> List[Dict[str, str]]:
+    def get_options(cls, clips: List['Clip'] = None, format: 'Format' = None) -> List[Dict[str, str]]:
         '''
             Returns a list of Option options for an html input
         '''
-        return [{'label': f'Include {cls.title(o)}', 'value': o} for o in cls]
+        if clips is None:
+            return [{'label': f'Include {cls.label(option)}', 'value': option} for option in cls]
+        else:
+            available_options = []
+            if any(cls.OUTRO in name for name in [clip.name for clip in clips]):
+                available_options.append(cls.OUTRO)
+
+            if any(cls.INTRO in name for name in [clip.name for clip in clips if format is None or clip.format == format]):
+                available_options.append(cls.INTRO)
+
+            return [{'label': f'Include {cls.label(option)}', 'value': option} for option in available_options]
 
 
-class Category(StrEnum):
+class Topic(StrEnum):
     PENALTIES = 'penalties'
     PACK_STUFF = 'pack_stuff'
     JAMMER_STUFF = 'jammer_stuff'
     OTHER = 'other'
 
     @classmethod
-    def label(cls, category: 'Category') -> str:
-        return category.replace('_', ' ').title()
+    def label(cls, topic: 'Topic') -> str:
+        return topic.replace('_', ' ').title()
 
     @classmethod
-    def get_all(cls) -> List['Category']:
-        return [f for f in cls]
+    def get_all(cls) -> List['Topic']:
+        return [topic for topic in cls]
 
     @classmethod
     def get_options(cls, clips: List['Clip'] = None) -> List[Dict[str, str]]:
         '''
-            Returns a list of Category options for an html input component
+            Returns a list of Topic options for an html input component
 
             Args:
                 clips (List[Clip]): (Optional) default None. When passed, options returned are filtered to only those \
                     that exist in the given list of clips
         '''
-        return [{'label': cls.label(c), 'value': c} for c in (cls if clips is None else {clip.category for clip in clips if clip.category is not None})]
+        return [{'label': cls.label(topic), 'value': topic} for topic in (cls if clips is None else {clip.topic for clip in clips if clip.topic is not None})]
 
 
 class Format(StrEnum):
@@ -83,6 +93,6 @@ class Format(StrEnum):
 @dataclass
 class Clip:
     format: Format | None
-    category: Category | None
+    topic: Topic | None
     name: str
     url: str
