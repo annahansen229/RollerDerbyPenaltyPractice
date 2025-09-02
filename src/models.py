@@ -35,13 +35,21 @@ class Option(StrEnum):
 
 class Topic(StrEnum):
     PENALTIES = 'penalties'
-    PACK_STUFF = 'pack_stuff'
-    JAMMER_STUFF = 'jammer_stuff'
+    PACK = 'pack'
+    JAMMER = 'jammer'
     OTHER = 'other'
 
     @classmethod
+    def sort(cls, members):
+        '''
+            Sort an iterable of Topic members in definition order
+        '''
+        order = {topic: i for i, topic in enumerate(cls)}
+        return sorted(members, key=order.get)
+
+    @classmethod
     def label(cls, topic: 'Topic') -> str:
-        return topic.replace('_', ' ').title()
+        return topic.title()
 
     @classmethod
     def get_all(cls) -> List['Topic']:
@@ -56,7 +64,7 @@ class Topic(StrEnum):
                 clips (List[Clip]): (Optional) default None. When passed, options returned are filtered to only those \
                     that exist in the given list of clips
         '''
-        return [{'label': cls.label(topic), 'value': topic} for topic in (cls if clips is None else {clip.topic for clip in clips if clip.topic is not None})]
+        return [{'label': cls.label(topic), 'value': topic} for topic in (cls if clips is None else cls.sort({clip.topic for clip in clips if clip.topic is not None}))]
 
 
 class Format(StrEnum):
