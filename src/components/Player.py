@@ -10,20 +10,22 @@ from src.models import Clip
 class Player(html.Div):
     def __init__(self, id, store):
 
-        super().__init__(id=id, hidden=True)
-
         self.video = 'video'
         self.store = store
 
-        self.children = [
-            dp.DashPlayer(
-                id=self.video,
-                url=None,
-                playing=False,
-                controls=True,
-                intervalCurrentTime=500,
-            ),
-        ]
+        super().__init__(
+            id=id,
+            hidden=True,
+            children=[
+                dp.DashPlayer(
+                    id=self.video,
+                    url=None,
+                    playing=False,
+                    controls=True,
+                    intervalCurrentTime=500,
+                ),
+            ]
+        )
 
         self.register_callbacks()
 
