@@ -1,28 +1,43 @@
 from dataclasses import asdict
-from typing import List
+from typing import Dict, List
 
+import dash_mantine_components as dmc
 import dash_player as dp
-from dash import Input, Output, State, get_app, html, no_update
+from dash import Input, Output, State, callback, dcc, html, no_update
 
 from src.models import Clip
 
 
 class Player(html.Div):
-    def __init__(self, id, store):
+    '''
+        Renders the Player component
+
+        Args:
+            id (str): The identifier of the player component
+            playlist (str): The identifier of the playlist store component
+    '''
+
+    def __init__(self, id: str, playlist: str):
 
         self.video = 'video'
-        self.store = store
+        self.finished = 'finished'
+        self.collapse = f'{id}_collapse'
+        self.playlist = playlist
 
         super().__init__(
             id=id,
-            hidden=True,
             children=[
-                dp.DashPlayer(
-                    id=self.video,
-                    url=None,
-                    playing=False,
-                    controls=True,
-                    intervalCurrentTime=500,
+                dcc.Store(id=self.finished, storage_type='session', data=False),
+                dmc.Collapse(
+                    dp.DashPlayer(
+                        id=self.video,
+                        url=None,
+                        playing=False,
+                        controls=True,
+                        intervalCurrentTime=500,
+                    ),
+                    opened=False,
+                    id=self.collapse,
                 ),
             ]
         )
@@ -30,46 +45,46 @@ class Player(html.Div):
         self.register_callbacks()
 
     def register_callbacks(self):
-        app = get_app()
-
-        app.callback(
+        callback(
             output=dict(
                 url=Output(self.video, 'url', allow_duplicate=True,),
-                store=Output(self.store, 'data', allow_duplicate=True,),
+                playlist=Output(self.playlist, 'data', allow_duplicate=True,),
+                finished=Output(self.finished, 'data', allow_duplicate=True,)
             ),
             inputs=dict(
                 current_time=Input(self.video, 'currentTime'),
             ),
             state=dict(
                 duration=State(self.video, 'duration'),
-                store=State(self.store, 'data'),
+                playlist=State(self.playlist, 'data'),
+                url=State(self.video, 'url'),
             ),
             prevent_initial_call=True
         )(self.play_next_video)
 
-        app.callback(
+        callback(
             output=dict(
-                hidden=Output(self.id, 'hidden', allow_duplicate=True,),
                 playing=Output(self.video, 'playing', allow_duplicate=True,),
+                opened=Output(self.collapse, 'opened')
             ),
             inputs=dict(
                 url=Input(self.video, 'url')
             ),
             prevent_initial_call=True
-        )(self.show_player)
+        )(self.toggle)
 
-    def show_player(self, url):
+    def toggle(self, url: str) -> Dict[str, bool]:
         '''
-            When there is no url, stop playing and hide player
-            When there is a url, start playing and show player
+            When there is no url, stop playing
+            When there is a url, start playing
         '''
         playing = bool(url)
         return dict(
-            hidden=not playing,
             playing=playing,
+            opened=playing,
         )
 
-    def play_next_video(self, current_time: float, duration: float, store: List[Clip]):
+    def play_next_video(self, current_time: float, duration: float, playlist: List[Clip], url: None | str) -> Dict[str, str | List[Clip] | bool]:
         '''
             When the current_time changes, check if the full video time has elapsed.
 
@@ -79,21 +94,24 @@ class Player(html.Div):
 
             If the full video time has not yet elapsed, do nothing.
         '''
-        url = no_update
+        new_url = no_update
         new_playlist = no_update
+        finished = no_update
 
-        if current_time == duration:
+        if current_time == duration and url is not None:
             # video has reached the end
             try:
-                next_video, *remaining_playlist = [Clip(**dict) for dict in store]
-                url = next_video.url
+                next_video, *remaining_playlist = [Clip(**dict) for dict in playlist]
+                new_url = next_video.url
                 new_playlist = [asdict(clip) for clip in remaining_playlist]
             except ValueError:
                 # end of the playlist
-                url = None
+                new_url = None
                 new_playlist = []
+                finished = True
 
         return dict(
-            url=url,
-            store=new_playlist,
+            url=new_url,
+            playlist=new_playlist,
+            finished=finished,
         )
