@@ -3,13 +3,17 @@
 import dash_mantine_components as dmc
 from dash import Dash, Input, Output, State, callback, dcc
 
-from src.components import OptionControls, Player, ThemeToggle
+from src.components import OptionControls, Player, Splash, ThemeToggle
 
 app = Dash()
 
 # Requires Dash 2.17.0 or later
 
-player = Player(id='player', store='store')
+playlist_id = 'store'
+
+player = Player(id='player', playlist=playlist_id)
+
+splash = Splash(player)
 
 layout = dmc.AppShell(
     [
@@ -42,12 +46,25 @@ layout = dmc.AppShell(
                 px="md",
             )
         ),
-        OptionControls(player),
-        dmc.AppShellMain(
+        OptionControls(player, playlist_id),
+        dmc.AppShellMain([
+            splash,
             player,
-        ),
+        ]),
+        dmc.AppShellFooter(
+            dmc.Text(children=[
+                'Thank you to ',
+                dmc.Anchor(
+                    "Axis of Stevil",
+                    href="https://www.youtube.com/feed/subscriptions/UCgxwwxOVwKbMNmivt-ImKJQ",
+                    c='grape'
+                ),
+                ', who graciously allowed me to use his video content to create this app.',
+            ]
+            ), p="md")
     ],
     header={"height": 60},
+    footer={"height": 60},
     navbar={
         "width": 300,
         "breakpoint": "sm",
@@ -59,7 +76,7 @@ layout = dmc.AppShell(
 
 app.layout = dmc.MantineProvider(
     [
-        dcc.Store(id='store', storage_type='session', data=[]),
+        dcc.Store(id=playlist_id, storage_type='session', data=[]),
         layout
     ],
     id='provider',

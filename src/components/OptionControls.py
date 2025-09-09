@@ -3,8 +3,10 @@ from typing import Dict, List, Union
 
 import dash_mantine_components as dmc
 from dash import Input, Output, State, callback
+from dash_iconify import DashIconify
 
 from src.clips import clips, get_playlist
+from src.components import Player
 from src.models import Format, Option, Topic
 
 
@@ -58,7 +60,7 @@ class TopicPicker(dmc.AccordionItem):
                 start_button_disabled=Output('start_button', 'disabled')
             )
         )
-        def validate_topics(selected):
+        def validate_topics(selected: List[Topic]) -> Dict[str, str | None | bool]:
             '''
                 Displays an error message when at least one topic is not selected
             '''
@@ -69,7 +71,7 @@ class TopicPicker(dmc.AccordionItem):
 
 
 class OptionPicker(dmc.AccordionItem):
-    def __init__(self, initial_format):
+    def __init__(self, initial_format: Format):
 
         self.initial_options = Option.get_options(clips, initial_format)
         self.initial_children = self.get_checkboxes(self.initial_options)
@@ -102,7 +104,7 @@ class OptionPicker(dmc.AccordionItem):
                 disabled=Output('options_accordion_control', 'value')
             ),
         )
-        def update_available_options(selected_format, selected_options) -> Dict[str, dmc.Stack | List[Option] | bool]:
+        def update_available_options(selected_format: Format, selected_options: List[Option]) -> Dict[str, dmc.Stack | List[Option] | bool]:
             '''
                 Updates the available Options when the selected Format changes
             '''
@@ -111,9 +113,13 @@ class OptionPicker(dmc.AccordionItem):
 
             children = self.get_checkboxes(available_options)
 
-            return dict(children=children, value=values, disabled=not available_options)
+            return dict(
+                children=children,
+                value=values,
+                disabled=not available_options
+            )
 
-    def get_checkboxes(self, options) -> dmc.Stack:
+    def get_checkboxes(self, options: List[Dict[str, str]]) -> dmc.Stack:
         '''
             Returns a stack of dmc.Checkbox controls for the given options
         '''
@@ -124,8 +130,15 @@ class OptionPicker(dmc.AccordionItem):
 
 
 class OptionControls(dmc.AppShellNavbar):
+    '''
+        Renders the Options control component
 
-    def __init__(self, player):
+        Args:
+            player (Player): The player component
+            playlist (str): The identifier of the playlist store component
+    '''
+
+    def __init__(self, player: Player, playlist: str):
         self.format_picker = FormatPicker()
         self.topic_picker = TopicPicker()
         self.option_picker = OptionPicker(self.format_picker.intial_format)
@@ -144,8 +157,9 @@ class OptionControls(dmc.AppShellNavbar):
                 ),
 
                 dmc.Button(
+                    'Start',
                     id='start_button',
-                    children='Start',
+                    rightSection=DashIconify(icon='flowbite:chevron-double-right-outline'),
                     variant='filled',
                     mt=10,
                 ),
@@ -155,10 +169,12 @@ class OptionControls(dmc.AppShellNavbar):
 
         @callback(
             output=dict(
-                store=Output('store', 'data', allow_duplicate=True,),
+                playlist=Output(playlist, 'data', allow_duplicate=True,),
                 start_button_text=Output('start_button', 'children', allow_duplicate=True,),
                 url=Output(player.video, 'url', allow_duplicate=True, ),
-            ),
+                finished=Output(player.finished, 'data', allow_duplicate=True),
+                mobile_burger=Output('mobile-burger', 'opened', allow_duplicate=True),
+                desktop_burger=Output('desktop-burger', 'opened', allow_duplicate=True),),
             inputs=dict(
                 btn=Input('start_button', 'n_clicks')
             ),
@@ -169,7 +185,7 @@ class OptionControls(dmc.AppShellNavbar):
             ),
             prevent_initial_call=True
         )
-        def start_button_click(format, topics, options, **kwargs) -> Dict[str, Union[bool, str, Dict]]:
+        def start_button_click(format: Format, topics: List[Topic], options: List[Option], **kwargs) -> Dict[str, Union[bool, str, Dict]]:
             '''
                 When the start button is clicked, get the playlist based on the selected options and
                 set the store contents and url of the first video
@@ -177,7 +193,10 @@ class OptionControls(dmc.AppShellNavbar):
             first_video, *remaining_playlist = get_playlist(format, topics, options)
 
             return dict(
-                store=[asdict(clip) for clip in remaining_playlist],
+                playlist=[asdict(clip) for clip in remaining_playlist],
                 start_button_text='Restart',
-                url=first_video.url
+                url=first_video.url,
+                finished=False,
+                mobile_burger=False,
+                desktop_burger=False,
             )
