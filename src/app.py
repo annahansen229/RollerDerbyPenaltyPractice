@@ -3,7 +3,7 @@
 import dash_mantine_components as dmc
 from dash import Dash, Input, Output, State, callback, dcc
 
-from src.components import OptionControls, Player
+from src.components import OptionControls, Player, ThemeToggle
 
 app = Dash()
 
@@ -16,20 +16,28 @@ layout = dmc.AppShell(
         dmc.AppShellHeader(
             dmc.Group(
                 [
-                    dmc.Burger(
-                        id='mobile-burger',
-                        size='sm',
-                        hiddenFrom='sm',
-                        opened=False,
+                    dmc.Group(
+                        [
+                            dmc.Burger(
+                                id='mobile-burger',
+                                size='sm',
+                                hiddenFrom='sm',
+                                opened=False,
+                            ),
+                            dmc.Burger(
+                                id="desktop-burger",
+                                size="sm",
+                                visibleFrom="sm",
+                                opened=True,
+                            ),
+                            dmc.Title(
+                                'Roller Derby Hand Signals and Verbal Cues Practice',
+                            ),
+                        ]
                     ),
-                    dmc.Burger(
-                        id="desktop-burger",
-                        size="sm",
-                        visibleFrom="sm",
-                        opened=True,
-                    ),
-                    dmc.Title('Roller Derby Hand Signals and Verbal Cues Practice')
+                    ThemeToggle(),
                 ],
+                justify='space-between',
                 h="100%",
                 px="md",
             )
@@ -49,10 +57,16 @@ layout = dmc.AppShell(
     id="appshell",
 )
 
-app.layout = dmc.MantineProvider([
-    dcc.Store(id='store', storage_type='session', data=[]),
-    layout
-])
+app.layout = dmc.MantineProvider(
+    [
+        dcc.Store(id='store', storage_type='session', data=[]),
+        layout
+    ],
+    id='provider',
+    theme={
+        "primaryColor": 'grape',
+    },
+)
 
 
 @callback(
