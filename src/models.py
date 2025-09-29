@@ -7,30 +7,19 @@ class Option(StrEnum):
     INTRO = 'intro'
     OUTRO = 'outro'
 
-    @classmethod
-    def label(cls, option: 'Option') -> str:
-        return option.title()
+    def label(self) -> str:
+        return f'Include {self.title()}'
 
     @classmethod
     def all(cls) -> List['Option']:
-        return [o for o in cls]
+        return [option for option in cls]
 
     @classmethod
-    def get_options(cls, clips: List['Clip'] = None, format: 'Format' = None) -> List[Dict[str, str]]:
+    def get_options(cls) -> List[Dict[str, str]]:
         '''
             Returns a list of Option options for an html input
         '''
-        if clips is None:
-            return [{'label': f'Include {cls.label(option)}', 'value': option} for option in cls]
-        else:
-            available_options = []
-            if any(cls.OUTRO in name for name in [clip.name for clip in clips]):
-                available_options.append(cls.OUTRO)
-
-            if any(cls.INTRO in name for name in [clip.name for clip in clips if format is None or clip.format == format]):
-                available_options.append(cls.INTRO)
-
-            return [{'label': f'Include {cls.label(option)}', 'value': option} for option in available_options]
+        return [{'label': option.label(), 'value': option} for option in cls]
 
 
 class Topic(StrEnum):
