@@ -98,7 +98,7 @@ class OptionPicker(dmc.AccordionItem):
         @callback(
             Input('format', 'value'),
             State('options', 'value'),
-            ouput=dict(
+            output=dict(
                 children=Output('options', 'children'),
                 value=Output('options', 'value'),
                 disabled=Output('options_accordion_control', 'value')
@@ -109,7 +109,7 @@ class OptionPicker(dmc.AccordionItem):
                 Updates the available Options when the selected Format changes
             '''
             available_options = Option.get_options(clips, selected_format)
-            values = [option['value'] for option in available_options if option in selected_options]
+            values = [option['value'] for option in available_options if option['value'] in selected_options]
 
             children = self.get_checkboxes(available_options)
 
