@@ -13,8 +13,6 @@ from src.models import Format, Option, Topic
 class FormatPicker(dmc.AccordionItem):
     def __init__(self):
 
-        self.intial_format = Format.get_default_option()
-
         super().__init__(
             children=[
                 dmc.AccordionControl('Practice Format'),
@@ -22,7 +20,7 @@ class FormatPicker(dmc.AccordionItem):
                     dmc.SegmentedControl(
                         id='format',
                         data=Format.get_options(clips),
-                        value=self.intial_format
+                        value=Format.get_default_option()
                     )
                 ),
             ],
@@ -71,62 +69,27 @@ class TopicPicker(dmc.AccordionItem):
 
 
 class OptionPicker(dmc.AccordionItem):
-    def __init__(self, initial_format: Format):
-
-        self.initial_options = Option.get_options(clips, initial_format)
-        self.initial_children = self.get_checkboxes(self.initial_options)
-        self.initial_value = [option['value'] for option in self.initial_options]
+    def __init__(self):
 
         super().__init__(
             children=[
                 dmc.AccordionControl(
                     'Other Options',
-                    disabled=not self.initial_options,
                     id='options_accordion_control'
                 ),
                 dmc.AccordionPanel(
                     dmc.CheckboxGroup(
                         id='options',
-                        children=self.initial_children,
-                        value=self.initial_value,
+                        children=dmc.Stack([
+                            dmc.Checkbox(**option, size='sm')
+                            for option in Option.get_options()
+                        ]),
+                        value=Option.all(),
                     ),
                 )
             ],
             value='options'
         )
-
-        @callback(
-            Input('format', 'value'),
-            State('options', 'value'),
-            output=dict(
-                children=Output('options', 'children'),
-                value=Output('options', 'value'),
-                disabled=Output('options_accordion_control', 'value')
-            ),
-        )
-        def update_available_options(selected_format: Format, selected_options: List[Option]) -> Dict[str, dmc.Stack | List[Option] | bool]:
-            '''
-                Updates the available Options when the selected Format changes
-            '''
-            available_options = Option.get_options(clips, selected_format)
-            values = [option['value'] for option in available_options if option['value'] in selected_options]
-
-            children = self.get_checkboxes(available_options)
-
-            return dict(
-                children=children,
-                value=values,
-                disabled=not available_options
-            )
-
-    def get_checkboxes(self, options: List[Dict[str, str]]) -> dmc.Stack:
-        '''
-            Returns a stack of dmc.Checkbox controls for the given options
-        '''
-        return dmc.Stack([
-            dmc.Checkbox(label=option['label'], value=option['value'], size='sm')
-            for option in options
-        ])
 
 
 class OptionControls(dmc.AppShellNavbar):
@@ -141,7 +104,7 @@ class OptionControls(dmc.AppShellNavbar):
     def __init__(self, player: Player, playlist: str):
         self.format_picker = FormatPicker()
         self.topic_picker = TopicPicker()
-        self.option_picker = OptionPicker(self.format_picker.intial_format)
+        self.option_picker = OptionPicker()
 
         super().__init__(
             id='navbar',
