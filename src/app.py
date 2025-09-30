@@ -7,7 +7,7 @@ from src.components import OptionControls, Player, Splash, ThemeToggle
 
 app = Dash()
 
-# Requires Dash 2.17.0 or later
+server = app.server
 
 playlist_id = 'store'
 
