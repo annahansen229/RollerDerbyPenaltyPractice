@@ -5,7 +5,7 @@ from dash import Dash, Input, Output, State, callback, dcc
 
 from src.components import OptionControls, Player, Splash, ThemeToggle
 
-app = Dash()
+app = Dash(__name__, title='Roller Derby Penalty Practice')
 
 server = app.server
 
