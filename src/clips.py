@@ -39,23 +39,38 @@ def get_clips() -> List[Clip]:
 clips = get_clips()
 
 
-def shuffle_clips(format: Format, topics: List[Topic]) -> List[Clip]:
+def get_sub_playlist(format: Format, topics: List[Topic], include_intro: bool) -> List[Clip]:
+    '''
+        Gets all clips for the given format and topics, and shuffles their order.
+        When `include_intro=True`, the intro clip for that format is included at the beginning
+    '''
     relevant_clips = [c for c in clips if c.format == format and c.topic in topics]
 
     random.shuffle(relevant_clips)
+
+    if include_intro:
+        intro = next((c for c in clips if Option.INTRO in c.name and format == c.format), None)
+        if intro:
+            relevant_clips.insert(0, intro)
 
     return relevant_clips
 
 
 def get_playlist(format: Format, topics: List[Topic], options: List[Option]) -> List[Clip]:
+    '''
+        Gets clips for the given formats and topics.
+        Content for each format is grouped together.
+        The outro clip is included at the end, when selected.
+    '''
     playlist = []
 
-    if Option.INTRO in options:
-        intro = next((c for c in clips if Option.INTRO in c.name and format == c.format), None)
-        if intro:
-            playlist.append(intro)
+    if format == Format.BOTH:
+        selected_formats = [Format.RECEPTIVE, Format.EXPRESSIVE]
+    else:
+        selected_formats = [format]
 
-    playlist.extend(shuffle_clips(format, topics))
+    for f in selected_formats:
+        playlist.extend(get_sub_playlist(f, topics, Option.INTRO in options))
 
     if Option.OUTRO in options:
         outro = next((c for c in clips if Option.OUTRO in c.name), None)
