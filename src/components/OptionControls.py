@@ -5,7 +5,7 @@ import dash_mantine_components as dmc
 from dash import Input, Output, State, callback
 from dash_iconify import DashIconify
 
-from src.clips import clips, get_playlist
+from src.clips import get_playlist
 from src.components import Player
 from src.models import Format, Option, Topic
 
@@ -38,10 +38,10 @@ class TopicPicker(dmc.AccordionItem):
                         dmc.CheckboxGroup(
                             id='topics',
                             children=dmc.Stack([
-                                dmc.Checkbox(label=option['label'], value=option['value'], size='sm')
-                                for option in Topic.get_options(clips)
+                                dmc.Checkbox(**option, size='sm')
+                                for option in Topic.get_options()
                             ]),
-                            value=Topic.get_all(),
+                            value=Topic.all(),
                         ),
                         id='topics-wrapper',
                         error=None,
@@ -73,10 +73,7 @@ class OptionPicker(dmc.AccordionItem):
 
         super().__init__(
             children=[
-                dmc.AccordionControl(
-                    'Other Options',
-                    id='options_accordion_control'
-                ),
+                dmc.AccordionControl('Other Options'),
                 dmc.AccordionPanel(
                     dmc.CheckboxGroup(
                         id='options',
