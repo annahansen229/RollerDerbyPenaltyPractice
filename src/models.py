@@ -57,19 +57,16 @@ class Topic(StrEnum):
 
 
 class Format(StrEnum):
-    EXPRESSIVE = 'expressive'
     RECEPTIVE = 'receptive'
+    BOTH = 'both'
+    EXPRESSIVE = 'expressive'
 
     @classmethod
     def get_all(cls) -> List['Format']:
-        return [f for f in cls]
+        return [format for format in cls]
 
     @classmethod
-    def label(cls, format: 'Format') -> str:
-        return format.title()
-
-    @classmethod
-    def get_options(cls, clips: List['Clip']) -> List[Dict[str, str]]:
+    def get_options(cls) -> List[Dict[str, str]]:
         '''
             Returns a list of Format options for an html input component
 
@@ -77,14 +74,13 @@ class Format(StrEnum):
                 clips (List[Clip]): (Optional) default None. When passed, options returned are filtered to only those \
                     that exist in the given list of clips
         '''
-        result = [{'label': cls.label(f), 'value': f}
-                  for f in (cls if clips is None else {clip.format for clip in clips if clip.format is not None})]
+        result = [{'label': format.title(), 'value': format} for format in cls]
 
         return result
 
     @classmethod
     def get_default_option(cls) -> 'Format':
-        return cls.EXPRESSIVE
+        return cls.BOTH
 
 
 @dataclass

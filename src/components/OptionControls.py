@@ -19,7 +19,7 @@ class FormatPicker(dmc.AccordionItem):
                 dmc.AccordionPanel(
                     dmc.SegmentedControl(
                         id='format',
-                        data=Format.get_options(clips),
+                        data=Format.get_options(),
                         value=Format.get_default_option()
                     )
                 ),
@@ -102,18 +102,15 @@ class OptionControls(dmc.AppShellNavbar):
     '''
 
     def __init__(self, player: Player, playlist: str):
-        self.format_picker = FormatPicker()
-        self.topic_picker = TopicPicker()
-        self.option_picker = OptionPicker()
 
         super().__init__(
             id='navbar',
             children=[
                 dmc.Accordion(
                     children=[
-                        self.format_picker,
-                        self.topic_picker,
-                        self.option_picker,
+                        FormatPicker(),
+                        TopicPicker(),
+                        OptionPicker(),
                     ],
                     multiple=True,
                     variant='contained'
