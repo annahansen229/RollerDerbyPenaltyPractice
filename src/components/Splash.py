@@ -69,13 +69,14 @@ class Splash(html.Div):
                                 dmc.Text(children=[
                                     dmc.Text('Choose ', span=True,),
                                     dmc.Text('Jammer', span=True, c='grape', inherit=True,),
-                                    ' to practice cues and signals related to jamming.'
+                                    ' to practice cues and signals related to jammers.'
                                 ]),
                                 dmc.Text(children=[
                                     dmc.Text('Choose ', span=True,),
                                     dmc.Text('Other', span=True, c='grape', inherit=True,),
                                     ' to practice other cues and signals that you may see on the track.'
                                 ]),
+
                             ],
                             inheritPadding=True,
                             mt='sm'
@@ -95,6 +96,22 @@ class Splash(html.Div):
                                     'Include the ',
                                     dmc.Text('Outro', span=True, c='grape', inherit=True,),
                                     ' to hear some parting words after you have completed practice.'
+                                ]),
+                            ],
+                            inheritPadding=True,
+                            mt='sm',
+                        ),
+                        dmc.CardSection(
+                            [
+                                dmc.Text(children=[
+                                    'When you click ',
+                                    dmc.Text('Start', span=True, c='grape', inherit=True,),
+                                    ' all the clips for your selected topics will be shuffled and played for you in a random order.'
+                                ]),
+                                dmc.Text(children=[
+                                    'Click ',
+                                    dmc.Text('Restart', span=True, c='grape', inherit=True,),
+                                    ' to start over with a new random order.'
                                 ]),
                             ],
                             inheritPadding=True,
