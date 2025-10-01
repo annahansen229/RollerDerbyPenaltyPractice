@@ -35,16 +35,30 @@ layout = dmc.AppShell(
                                 opened=True,
                             ),
                             dmc.Title(
-                                'Roller Derby Hand Signals and Verbal Cues Practice',
+                                'Roller Derby Signals and Cues Practice',
+                                id='mobile-title',
+                                order=6,
+                                hiddenFrom='sm'
                             ),
-                        ]
+                            dmc.Title(
+                                'Roller Derby Hand Signals and Verbal Cues Practice',
+                                id='desktop-title',
+                                order=3,
+                                visibleFrom='sm'
+                            ),
+
+                        ],
+                        gap='xs',
+                        wrap='nowrap',
                     ),
                     ThemeToggle(),
                 ],
+                gap='xs',
+                wrap='nowrap',
                 justify='space-between',
                 h="100%",
                 px="md",
-            )
+            ),
         ),
         OptionControls(player, playlist_id),
         dmc.AppShellMain([
@@ -61,10 +75,20 @@ layout = dmc.AppShell(
                 ),
                 ', who graciously allowed me to use his video content to create this app.',
             ]
-            ), p="md")
+            ),
+            px="md",
+            display='flex',
+            style={'align-items': 'center'},
+        )
     ],
-    header={"height": 60},
-    footer={"height": 60},
+    header={
+        "height": 60,
+        "offset": True,
+    },
+    footer={
+        "height": {'sm': 80, 'lg': 60},
+        "offset": True,
+    },
     navbar={
         "width": 300,
         "breakpoint": "sm",
