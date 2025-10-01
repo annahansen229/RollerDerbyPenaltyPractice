@@ -35,6 +35,7 @@ class Player(html.Div):
                         playing=False,
                         controls=True,
                         intervalCurrentTime=500,
+                        style={'maxWidth': '100%'}
                     ),
                     opened=False,
                     id=self.collapse,
