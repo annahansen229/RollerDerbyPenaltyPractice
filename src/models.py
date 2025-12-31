@@ -36,10 +36,6 @@ class Topic(StrEnum):
     def get_options(cls) -> List[Dict[str, str]]:
         '''
             Returns a list of Topic options for an html input component
-
-            Args:
-                clips (List[Clip]): (Optional) default None. When passed, options returned are filtered to only those \
-                    that exist in the given list of clips
         '''
         return [{'label': topic.title(), 'value': topic} for topic in cls]
 
@@ -57,10 +53,6 @@ class Format(StrEnum):
     def get_options(cls) -> List[Dict[str, str]]:
         '''
             Returns a list of Format options for an html input component
-
-            Args:
-                clips (List[Clip]): (Optional) default None. When passed, options returned are filtered to only those \
-                    that exist in the given list of clips
         '''
         return [{'label': format.title(), 'value': format} for format in cls]
 
