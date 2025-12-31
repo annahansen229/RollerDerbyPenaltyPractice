@@ -9,7 +9,7 @@ from src.components import Player
 
 class Splash(html.Div):
     '''
-        Renders the Welcome component. 
+        Renders the Welcome component.
 
         Args:
             player (Player): The Player component
@@ -190,6 +190,9 @@ class Splash(html.Div):
             prevent_initial_call=True,
         )
         def toggle_content(playing: bool, finished: bool) -> Dict[str, bool | List]:
+            '''
+                Shows or hides the Splash contents depending on the state of the video player
+            '''
             return dict(
                 welcome_open=False if playing else not finished,
                 finished_open=False if playing else finished,

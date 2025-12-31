@@ -2,8 +2,12 @@
 
 import dash_mantine_components as dmc
 from dash import Dash, Input, Output, State, callback, dcc
+from dotenv import load_dotenv
 
-from src.components import OptionControls, Player, Splash, ThemeToggle
+from src.components import (ContactForm, OptionControls, Player, Splash,
+                            ThemeToggle)
+
+load_dotenv()
 
 app = Dash(__name__, title='Roller Derby Penalty Practice')
 
@@ -14,6 +18,8 @@ playlist_id = 'store'
 player = Player(id='player', playlist=playlist_id)
 
 splash = Splash(player)
+
+contact_form = ContactForm()
 
 layout = dmc.AppShell(
     [
@@ -60,10 +66,11 @@ layout = dmc.AppShell(
                 px="md",
             ),
         ),
-        OptionControls(player, playlist_id),
+        OptionControls(player, playlist_id, contact_form.id),
         dmc.AppShellMain([
             splash,
             player,
+            contact_form,
         ]),
         dmc.AppShellFooter(
             dmc.Text(children=[
