@@ -1,13 +1,12 @@
-from dataclasses import asdict
 from typing import Dict, List, Union
 
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, callback, no_update
 from dash_iconify import DashIconify
 
 from src.clips import get_playlist
 from src.components import Player
-from src.models import Format, Option, Topic
+from src.models import AppStore, Format, Option, Topic
 
 
 class FormatPicker(dmc.AccordionItem):
@@ -96,17 +95,17 @@ class OptionPicker(dmc.AccordionItem):
         )
 
 
-class OptionControls(dmc.AppShellNavbar):
+class NavBar(dmc.AppShellNavbar):
     '''
         Renders the Options control component
 
         Args:
             player (Player): The player component
-            playlist (str): The identifier of the playlist store component
             contact_form (str): The identifier of the contact form component
+            app_store (str): The identifier of the app store
     '''
 
-    def __init__(self, player: Player, playlist: str, contact_form: str):
+    def __init__(self, player: Player, contact_form: str, app_store: str):
         self.contact_button_id = 'contact_button'
         self.start_button_id = 'start_button'
 
@@ -142,12 +141,13 @@ class OptionControls(dmc.AppShellNavbar):
 
         @callback(
             output=dict(
-                playlist=Output(playlist, 'data', allow_duplicate=True,),
+                player_store=Output(player.store, 'data', allow_duplicate=True,),
                 start_button_text=Output(self.start_button_id, 'children', allow_duplicate=True,),
                 url=Output(player.video, 'url', allow_duplicate=True, ),
-                finished=Output(player.finished, 'data', allow_duplicate=True),
                 mobile_burger=Output('mobile-burger', 'opened', allow_duplicate=True),
-                desktop_burger=Output('desktop-burger', 'opened', allow_duplicate=True),),
+                desktop_burger=Output('desktop-burger', 'opened', allow_duplicate=True),
+                app_store=Output(app_store, 'data', allow_duplicate=True)
+            ),
             inputs=dict(
                 btn=Input(self.start_button_id, 'n_clicks')
             ),
@@ -160,46 +160,59 @@ class OptionControls(dmc.AppShellNavbar):
         )
         def start_button_click(format: Format, topics: List[Topic], options: List[Option], **kwargs) -> Dict[str, Union[bool, str, Dict]]:
             '''
-                When the start button is clicked, get the playlist based on the selected options and
-                set the store contents and url of the first video
+                When the start button is clicked, get the playlist based on the selected options, 
+                set the store contents and url of the first video, and start playing
             '''
             first_video, *remaining_playlist = get_playlist(format, topics, options)
 
             return dict(
-                playlist=[asdict(clip) for clip in remaining_playlist],
+                player_store=remaining_playlist,
                 start_button_text='Restart',
-                url=first_video.url,
-                finished=False,
+                url=first_video['url'],
                 mobile_burger=False,
                 desktop_burger=False,
+                app_store=AppStore(active=player.id, last=None, finished=False),
             )
 
         @callback(
             output=dict(
-                hide_contact_form=Output(contact_form, 'hidden'),
-                contact_button_text=Output(self.contact_button_id, 'children')
+                contact_button_text=Output(self.contact_button_id, 'children'),
+                app_store=Output(app_store, 'data', allow_duplicate=True),
+                playing=Output(player.video, 'playing', allow_duplicate=True)
             ),
             inputs=dict(
                 btn=Input(self.contact_button_id, 'n_clicks')
             ),
             state=dict(
-                currently_hidden=State(contact_form, 'hidden')
-            )
+                currently_hidden=State(contact_form, 'hidden'),
+                old_app_store=State(app_store, 'data'),
+            ),
+            prevent_initial_call=True
         )
-        def contact_button_click(currently_hidden, **kwargs) -> Dict[str, Union[bool, str]]:
+        def contact_button_click(currently_hidden, old_app_store: Dict[str, str], **kwargs) -> Dict[str, Union[bool, str]]:
             '''
                 Hides/Shows the contact form, and modifies the contact button text based on new state
             '''
             if currently_hidden:
-                contact_button_text = 'Close Contact Form'
-                hide_contact_form = False
-                # hide_other_content = True
-            else:
-                contact_button_text = 'Contact Us'
-                hide_contact_form = True
-                # hide_other_content = True
+                last = old_app_store.get('active')
+                return dict(
+                    contact_button_text='Close Contact Form',
+                    app_store=AppStore(
+                        active=contact_form,
+                        last=last,
+                        finished=old_app_store.get('finished')
+                    ),
+                    playing=False if last == player.id else no_update
+                )
 
-            return dict(
-                contact_button_text=contact_button_text,
-                hide_contact_form=hide_contact_form
-            )
+            else:
+                active = old_app_store.get('last')
+                return dict(
+                    contact_button_text='Contact Us',
+                    app_store=AppStore(
+                        active=active,
+                        last=contact_form,
+                        finished=old_app_store.get('finished')
+                    ),
+                    playing=True if active == player.id else no_update
+                )

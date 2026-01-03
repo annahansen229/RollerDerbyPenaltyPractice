@@ -4,18 +4,21 @@ import dash_mantine_components as dmc
 from dash import Input, Output, callback, html
 from dash_iconify import DashIconify
 
-from src.components import Player
+from src.models import AppStore
 
 
 class Splash(html.Div):
     '''
         Renders the Welcome component.
-
-        Args:
-            player (Player): The Player component
     '''
 
-    def __init__(self, player: Player):
+    def __init__(self, app_store: str):
+        '''
+            Args:
+                app_store (str): The identifier of the app store component
+        '''
+        self.id = 'splash'
+
         self.welcome = 'splash_welcome'
         self.finished = 'splash_finished'
 
@@ -172,6 +175,8 @@ class Splash(html.Div):
         )
 
         super().__init__(
+            id=self.id,
+            hidden=False,
             children=[
                 self.welcome_content,
                 self.finished_content,
@@ -179,23 +184,21 @@ class Splash(html.Div):
         )
 
         @callback(
+            Input(app_store, 'data'),
             output=dict(
                 welcome_open=Output(self.welcome, 'opened', allow_duplicate=True),
-                finished_open=Output(self.finished, 'opened', allow_duplicate=True)
-            ),
-            inputs=dict(
-                playing=Input(player.video, 'playing'),
-                finished=Input(player.finished, 'data'),
+                finished_open=Output(self.finished, 'opened', allow_duplicate=True),
             ),
             prevent_initial_call=True,
         )
-        def toggle_content(playing: bool, finished: bool) -> Dict[str, bool | List]:
+        def toggle_content(app_store: AppStore) -> Dict[str, bool | List]:
             '''
-                Shows or hides the Splash contents depending on the state of the video player
+                Shows or hides the Splash contents depending on the finished state
             '''
+            finished_open = app_store['finished']
             return dict(
-                welcome_open=False if playing else not finished,
-                finished_open=False if playing else finished,
+                finished_open=finished_open,
+                welcome_open=not finished_open,
             )
 
         @callback(

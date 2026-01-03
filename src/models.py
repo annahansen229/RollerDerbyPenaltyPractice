@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from enum import StrEnum
-from typing import Dict, List
+from typing import Dict, List, TypedDict
 
 
 class Option(StrEnum):
@@ -61,9 +60,14 @@ class Format(StrEnum):
         return cls.BOTH
 
 
-@dataclass
-class Clip:
+class Clip(TypedDict):
     format: Format | None
     topic: Topic | None
     name: str
     url: str
+
+
+class AppStore(TypedDict):
+    active: str
+    last: str | None
+    finished: bool
