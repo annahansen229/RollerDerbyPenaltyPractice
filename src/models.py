@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from enum import StrEnum
-from typing import Dict, List
+from typing import Dict, List, TypedDict
 
 
 class Option(StrEnum):
@@ -36,10 +35,6 @@ class Topic(StrEnum):
     def get_options(cls) -> List[Dict[str, str]]:
         '''
             Returns a list of Topic options for an html input component
-
-            Args:
-                clips (List[Clip]): (Optional) default None. When passed, options returned are filtered to only those \
-                    that exist in the given list of clips
         '''
         return [{'label': topic.title(), 'value': topic} for topic in cls]
 
@@ -57,10 +52,6 @@ class Format(StrEnum):
     def get_options(cls) -> List[Dict[str, str]]:
         '''
             Returns a list of Format options for an html input component
-
-            Args:
-                clips (List[Clip]): (Optional) default None. When passed, options returned are filtered to only those \
-                    that exist in the given list of clips
         '''
         return [{'label': format.title(), 'value': format} for format in cls]
 
@@ -69,9 +60,14 @@ class Format(StrEnum):
         return cls.BOTH
 
 
-@dataclass
-class Clip:
+class Clip(TypedDict):
     format: Format | None
     topic: Topic | None
     name: str
     url: str
+
+
+class AppStore(TypedDict):
+    active: str
+    last: str | None
+    finished: bool

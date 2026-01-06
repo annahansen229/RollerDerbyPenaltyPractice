@@ -1,19 +1,27 @@
 
 
+from typing import Dict
+
 import dash_mantine_components as dmc
 from dash import Dash, Input, Output, State, callback, dcc
+from dotenv import load_dotenv
 
-from src.components import OptionControls, Player, Splash, ThemeToggle
+from src.components import ContactForm, NavBar, Player, Splash, ThemeToggle
+from src.models import AppStore
+
+load_dotenv()
 
 app = Dash(__name__, title='Roller Derby Penalty Practice')
 
 server = app.server
 
-playlist_id = 'store'
+app_store_id = 'app_store'
 
-player = Player(id='player', playlist=playlist_id)
+splash = Splash(app_store=app_store_id)
 
-splash = Splash(player)
+player = Player(app_store=app_store_id, splash=splash.id)
+
+contact_form = ContactForm()
 
 layout = dmc.AppShell(
     [
@@ -60,10 +68,15 @@ layout = dmc.AppShell(
                 px="md",
             ),
         ),
-        OptionControls(player, playlist_id),
+        NavBar(
+            player=player,
+            contact_form=contact_form.id,
+            app_store=app_store_id
+        ),
         dmc.AppShellMain([
             splash,
             player,
+            contact_form,
         ]),
         dmc.AppShellFooter(
             dmc.Text(children=[
@@ -100,7 +113,7 @@ layout = dmc.AppShell(
 
 app.layout = dmc.MantineProvider(
     [
-        dcc.Store(id=playlist_id, storage_type='session', data=[]),
+        dcc.Store(id=app_store_id, storage_type='session', data=AppStore(active=splash.id, last=None, finished=False)),
         layout
     ],
     id='provider',
@@ -122,6 +135,24 @@ def toggle_navbar(mobile_opened, desktop_opened, navbar):
         "desktop": not desktop_opened,
     }
     return navbar
+
+
+@callback(
+    Input(app_store_id, 'data'),
+    output=dict(
+        splash_hidden=Output(splash.id, 'hidden'),
+        player_hidden=Output(player.id, 'hidden'),
+        contact_form_hidden=Output(contact_form.id, 'hidden'),
+    ),
+    prevent_initial_call=True
+)
+def set_active_content(app_store: AppStore) -> Dict[str, bool]:
+    active_id = app_store['active']
+    return dict(
+        splash_hidden=active_id != splash.id,
+        player_hidden=active_id != player.id,
+        contact_form_hidden=active_id != contact_form.id
+    )
 
 
 if __name__ == '__main__':
