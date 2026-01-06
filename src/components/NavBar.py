@@ -160,8 +160,8 @@ class NavBar(dmc.AppShellNavbar):
         )
         def start_button_click(format: Format, topics: List[Topic], options: List[Option], **kwargs) -> Dict[str, Union[bool, str, Dict]]:
             '''
-                When the start button is clicked, get the playlist based on the selected options, 
-                set the store contents and url of the first video, and start playing
+                When the start button is clicked, get the playlist based on the selected options, and
+                set the store contents and url of the first video
             '''
             first_video, *remaining_playlist = get_playlist(format, topics, options)
 
@@ -191,7 +191,8 @@ class NavBar(dmc.AppShellNavbar):
         )
         def contact_button_click(currently_hidden, old_app_store: Dict[str, str], **kwargs) -> Dict[str, Union[bool, str]]:
             '''
-                Hides/Shows the contact form, and modifies the contact button text based on new state
+                Hides/Shows the contact form, modifies the contact button text based on new state, and
+                pauses playback if mid-session
             '''
             if currently_hidden:
                 last = old_app_store.get('active')
