@@ -29,7 +29,7 @@ def get_clips() -> List[Clip]:
                 topic = Topic(f.parent.name)
                 format = Format(f.parent.parent.name)
 
-            clips.append(Clip(format, topic, f.name, str(f)))
+            clips.append(Clip(format=format, topic=topic, name=f.name, url=str(f)))
         except ValueError:
             pass
 
@@ -44,12 +44,12 @@ def get_sub_playlist(format: Format, topics: List[Topic], include_intro: bool) -
         Gets all clips for the given format and topics, and shuffles their order.
         When `include_intro=True`, the intro clip for that format is included at the beginning
     '''
-    relevant_clips = [c for c in clips if c.format == format and c.topic in topics]
+    relevant_clips = [c for c in clips if c['format'] == format and c['topic'] in topics]
 
     random.shuffle(relevant_clips)
 
     if include_intro:
-        intro = next((c for c in clips if Option.INTRO in c.name and format == c.format), None)
+        intro = next((c for c in clips if Option.INTRO in c['name'] and format == c['format']), None)
         if intro:
             relevant_clips.insert(0, intro)
 
@@ -73,7 +73,7 @@ def get_playlist(format: Format, topics: List[Topic], options: List[Option]) -> 
         playlist.extend(get_sub_playlist(f, topics, Option.INTRO in options))
 
     if Option.OUTRO in options:
-        outro = next((c for c in clips if Option.OUTRO in c.name), None)
+        outro = next((c for c in clips if Option.OUTRO in c['name']), None)
         if outro:
             playlist.append(outro)
 
