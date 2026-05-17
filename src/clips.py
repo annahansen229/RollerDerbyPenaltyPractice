@@ -9,25 +9,25 @@ def get_clips() -> List[Clip]:
     '''
         Gets all clips in the static directory and organizes them by topic and format
 
-        Clips are expected to be organized like `static/{Format}/{Topic}/{*.mp4}`
+        Clips are expected to be organized like `static/video/{Topic}/{Format}/{*.mp4}`
 
         If the subfolder names are not valid `Format`s or `Topic`s, the video is not included in the return value.
     '''
-    all_files = [f.relative_to('src') for f in Path("src/static/").rglob('*') if f.is_file()]
+    all_files = [f.relative_to('src') for f in Path("src/static/video/").rglob('*') if f.is_file()]
 
     clips = []
 
     for f in all_files:
         try:
             if "intro" in f.name:
-                format = Format(f.parent.name)
+                format = Format(f.stem.removeprefix('intro').strip('-'))
                 topic = None
             elif "outro" in f.name:
                 format = None
                 topic = None
             else:
-                topic = Topic(f.parent.name)
-                format = Format(f.parent.parent.name)
+                topic = Topic(f.parent.parent.name)
+                format = Format(f.parent.name)
 
             clips.append(Clip(format=format, topic=topic, name=f.name, url=str(f)))
         except ValueError:
