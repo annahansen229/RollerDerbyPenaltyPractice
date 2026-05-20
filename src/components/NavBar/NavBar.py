@@ -8,6 +8,7 @@ from .MediaFormatPicker import MediaFormatPicker
 from .OptionPicker import OptionPicker
 from .PracticeFormatPicker import PracticeFormatPicker
 from .TopicPicker import TopicPicker
+from .PlaybackModePicker import PlaybackModePicker
 from src.clips import get_playlist
 from src.components import Player
 from src.models import AppStore, PracticeFormat, Option, Topic
@@ -30,30 +31,39 @@ class NavBar(dmc.AppShellNavbar):
         super().__init__(
             id='navbar',
             children=[
-                dmc.Accordion(
+                dmc.ScrollArea(
                     children=[
-                        MediaFormatPicker(),
-                        PracticeFormatPicker(),
-                        TopicPicker(self.start_button_id),
-                        OptionPicker(),
-                    ],
-                    multiple=True,
-                    variant='contained'
-                ),
+                        dmc.Accordion(
+                            children=[
+                                MediaFormatPicker(),
+                                PlaybackModePicker(),
+                                PracticeFormatPicker(),
+                                TopicPicker(self.start_button_id),
+                                OptionPicker(),
+                            ],
+                            multiple=True,
+                            variant='contained',
+                            mb=10,
+                        ),
 
-                dmc.Button(
-                    'Start',
-                    id=self.start_button_id,
-                    rightSection=DashIconify(icon='flowbite:chevron-double-right-outline'),
-                    variant='filled',
-                    mt=10,
+                        dmc.Button(
+                            'Start',
+                            id=self.start_button_id,
+                            rightSection=DashIconify(icon='flowbite:chevron-double-right-outline'),
+                            variant='filled',
+                            my=10,
+                            fullWidth=True,
+                        ),
+                    ],
+                    mb=10
                 ),
 
                 dmc.Button(
                     'Contact Us',
                     id=self.contact_button_id,
-                    mt='auto'
-                )
+                    mt='auto',
+                    fullWidth=True,
+                ),
             ],
             p='md'
         )

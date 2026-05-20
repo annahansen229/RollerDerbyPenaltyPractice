@@ -39,9 +39,25 @@ class Topic(StrEnum):
         return [{'label': topic.title(), 'value': topic} for topic in cls]
 
 
+class PlaybackMode(StrEnum):
+    AUTOMATIC = 'automatic'
+    MANUAL = 'manual'
+
+    @classmethod
+    def get_options(cls) -> List[Dict[str, str]]:
+        '''
+            Returns a list of PlaybackFormat options for an html input component
+        '''
+        return [{'label': format.title(), 'value': format} for format in cls]
+
+    @classmethod
+    def get_default_option(cls) -> 'PracticeFormat':
+        return cls.AUTOMATIC
+
+
 class MediaFormat(StrEnum):
-    IMAGE = 'image'
     VIDEO = 'video'
+    IMAGE = 'image'
 
     @classmethod
     def get_options(cls) -> List[Dict[str, str]]:

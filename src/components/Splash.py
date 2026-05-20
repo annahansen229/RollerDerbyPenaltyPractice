@@ -36,17 +36,58 @@ class Splash(html.Div):
                         dmc.CardSection(
                             [
                                 dmc.Text(
+                                    "Media Format Options",
+                                    fw=500,
+                                ),
+                                dmc.Text(children=[
+                                    dmc.Text('Choose ', span=True,),
+                                    dmc.Text('Video', span=True, c='grape', inherit=True,),
+                                    ' to practice with video and sound prompts.'
+                                ]),
+                                dmc.Text(children=[
+                                    dmc.Text('Choose ', span=True,),
+                                    dmc.Text('Image', span=True, c='grape', inherit=True,),
+                                    ' to practice with image and text prompts.'
+                                ]),
+                            ],
+                            inheritPadding=True,
+                            mt='sm'
+                        ),
+                        dmc.CardSection(
+                            [
+                                dmc.Text(
+                                    "Playback Mode Options (Text/Image Format)",
+                                    fw=500,
+                                ),
+                                dmc.Text(children=[
+                                    dmc.Text('Choose ', span=True,),
+                                    dmc.Text('Automatic', span=True, c='grape', inherit=True,),
+                                    ' and the app will automatically advance the prompts and answers.'
+                                ]),
+                                dmc.Text(children=[
+                                    dmc.Text('Choose ', span=True,),
+                                    dmc.Text('Manual', span=True, c='grape', inherit=True,),
+                                    " and the app will advance when you click 'Next'. You will also have the option "
+                                    "to set the amount of time the prompts and answers are displayed before the app advances."
+                                ]),
+                            ],
+                            inheritPadding=True,
+                            mt='sm'
+                        ),
+                        dmc.CardSection(
+                            [
+                                dmc.Text(
                                     "Practice Format Options",
                                     fw=500,
                                 ),
                                 dmc.Text(children=[
                                     dmc.Text('Choose ', span=True,),
-                                    dmc.Text('Expressive Format', span=True, c='grape', inherit=True,),
-                                    ' to hear and see the verbal cue, and then perform the correct hand signal.'
+                                    dmc.Text('Expressive', span=True, c='grape', inherit=True,),
+                                    ' to hear and/or see the verbal cue, and then perform the correct hand signal.'
                                 ]),
                                 dmc.Text(children=[
                                     dmc.Text('Choose ', span=True,),
-                                    dmc.Text('Receptive Format', span=True, c='grape', inherit=True,),
+                                    dmc.Text('Receptive', span=True, c='grape', inherit=True,),
                                     ' to see the hand signal, and then say the correct verbal cue.'
                                 ]),
                             ],
@@ -109,7 +150,7 @@ class Splash(html.Div):
                                 dmc.Text(children=[
                                     'When you click ',
                                     dmc.Text('Start', span=True, c='grape', inherit=True,),
-                                    ' all the clips for your selected topics will be shuffled and played for you in a random order.'
+                                    ' all the content for your selected topics will be shuffled and displayed for you in a random order.'
                                 ]),
                                 dmc.Text(children=[
                                     'Click ',
