@@ -2,16 +2,16 @@ import random
 from pathlib import Path
 from typing import List
 
-from src.models import Clip, Format, Option, Topic
+from src.models import Clip, PracticeFormat, Option, Topic
 
 
 def get_clips() -> List[Clip]:
     '''
         Gets all clips in the static directory and organizes them by topic and format
 
-        Clips are expected to be organized like `static/video/{Topic}/{Format}/{*.mp4}`
+        Clips are expected to be organized like `static/video/{Topic}/{PracticeFormat}/{*.mp4}`
 
-        If the subfolder names are not valid `Format`s or `Topic`s, the video is not included in the return value.
+        If the subfolder names are not valid `PracticeFormat`s or `Topic`s, the video is not included in the return value.
     '''
     all_files = [f.relative_to('src') for f in Path("src/static/video/").rglob('*') if f.is_file()]
 
@@ -20,14 +20,14 @@ def get_clips() -> List[Clip]:
     for f in all_files:
         try:
             if "intro" in f.name:
-                format = Format(f.stem.removeprefix('intro').strip('-'))
+                format = PracticeFormat(f.stem.removeprefix('intro').strip('-'))
                 topic = None
             elif "outro" in f.name:
                 format = None
                 topic = None
             else:
                 topic = Topic(f.parent.parent.name)
-                format = Format(f.parent.name)
+                format = PracticeFormat(f.parent.name)
 
             clips.append(Clip(format=format, topic=topic, name=f.name, url=str(f)))
         except ValueError:
@@ -39,7 +39,7 @@ def get_clips() -> List[Clip]:
 clips = get_clips()
 
 
-def get_sub_playlist(format: Format, topics: List[Topic], include_intro: bool) -> List[Clip]:
+def get_sub_playlist(format: PracticeFormat, topics: List[Topic], include_intro: bool) -> List[Clip]:
     '''
         Gets all clips for the given format and topics, and shuffles their order.
         When `include_intro=True`, the intro clip for that format is included at the beginning
@@ -56,7 +56,7 @@ def get_sub_playlist(format: Format, topics: List[Topic], include_intro: bool) -
     return relevant_clips
 
 
-def get_playlist(format: Format, topics: List[Topic], options: List[Option]) -> List[Clip]:
+def get_playlist(format: PracticeFormat, topics: List[Topic], options: List[Option]) -> List[Clip]:
     '''
         Gets clips for the given formats and topics.
         Content for each format is grouped together.
@@ -64,8 +64,8 @@ def get_playlist(format: Format, topics: List[Topic], options: List[Option]) -> 
     '''
     playlist = []
 
-    if format == Format.BOTH:
-        selected_formats = [Format.RECEPTIVE, Format.EXPRESSIVE]
+    if format == PracticeFormat.BOTH:
+        selected_formats = [PracticeFormat.RECEPTIVE, PracticeFormat.EXPRESSIVE]
     else:
         selected_formats = [format]
 

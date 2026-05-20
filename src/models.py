@@ -39,29 +39,45 @@ class Topic(StrEnum):
         return [{'label': topic.title(), 'value': topic} for topic in cls]
 
 
-class Format(StrEnum):
+class MediaFormat(StrEnum):
+    IMAGE = 'image'
+    VIDEO = 'video'
+
+    @classmethod
+    def get_options(cls) -> List[Dict[str, str]]:
+        '''
+            Returns a list of MediaFormat options for an html input component
+        '''
+        return [{'label': format.title(), 'value': format} for format in cls]
+
+    @classmethod
+    def get_default_option(cls) -> 'PracticeFormat':
+        return cls.VIDEO
+
+
+class PracticeFormat(StrEnum):
     RECEPTIVE = 'receptive'
     BOTH = 'both'
     EXPRESSIVE = 'expressive'
 
     @classmethod
-    def all(cls) -> List['Format']:
+    def all(cls) -> List['PracticeFormat']:
         return [format for format in cls]
 
     @classmethod
     def get_options(cls) -> List[Dict[str, str]]:
         '''
-            Returns a list of Format options for an html input component
+            Returns a list of PracticeFormat options for an html input component
         '''
         return [{'label': format.title(), 'value': format} for format in cls]
 
     @classmethod
-    def get_default_option(cls) -> 'Format':
+    def get_default_option(cls) -> 'PracticeFormat':
         return cls.BOTH
 
 
 class Clip(TypedDict):
-    format: Format | None
+    format: PracticeFormat | None
     topic: Topic | None
     name: str
     url: str

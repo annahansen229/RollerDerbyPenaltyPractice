@@ -6,24 +6,40 @@ from dash_iconify import DashIconify
 
 from src.clips import get_playlist
 from src.components import Player
-from src.models import AppStore, Format, Option, Topic
+from src.models import AppStore, PracticeFormat, Option, Topic, MediaFormat
 
 
-class FormatPicker(dmc.AccordionItem):
+class MediaFormatPicker(dmc.AccordionItem):
     def __init__(self):
+        super().__init__(
+            children=[
+                dmc.AccordionControl('Media Format'),
+                dmc.AccordionPanel(
+                    dmc.SegmentedControl(
+                        id='media-format',
+                        data=MediaFormat.get_options(),
+                        value=MediaFormat.get_default_option()
+                    )
+                ),
+            ],
+            value='media-format',
+        )
 
+
+class PracticeFormatPicker(dmc.AccordionItem):
+    def __init__(self):
         super().__init__(
             children=[
                 dmc.AccordionControl('Practice Format'),
                 dmc.AccordionPanel(
                     dmc.SegmentedControl(
-                        id='format',
-                        data=Format.get_options(),
-                        value=Format.get_default_option()
+                        id='practice-format',
+                        data=PracticeFormat.get_options(),
+                        value=PracticeFormat.get_default_option()
                     )
-                ),
+                )
             ],
-            value='format',
+            value='practice-format',
         )
 
 
@@ -114,7 +130,8 @@ class NavBar(dmc.AppShellNavbar):
             children=[
                 dmc.Accordion(
                     children=[
-                        FormatPicker(),
+                        MediaFormatPicker(),
+                        PracticeFormatPicker(),
                         TopicPicker(self.start_button_id),
                         OptionPicker(),
                     ],
@@ -152,13 +169,13 @@ class NavBar(dmc.AppShellNavbar):
                 btn=Input(self.start_button_id, 'n_clicks')
             ),
             state=dict(
-                format=State('format', 'value'),
+                format=State('practice-format', 'value'),
                 topics=State('topics', 'value'),
                 options=State('options', 'value'),
             ),
             prevent_initial_call=True
         )
-        def start_button_click(format: Format, topics: List[Topic], options: List[Option], **kwargs) -> Dict[str, Union[bool, str, Dict]]:
+        def start_button_click(format: PracticeFormat, topics: List[Topic], options: List[Option], **kwargs) -> Dict[str, Union[bool, str, Dict]]:
             '''
                 When the start button is clicked, get the playlist based on the selected options, and
                 set the store contents and url of the first video
