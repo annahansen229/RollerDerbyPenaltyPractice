@@ -98,6 +98,7 @@ class Media(TypedDict):
     topic: Topic | None
     name: str
     url: str
+    cue: str
 
 
 class AppStore(TypedDict):

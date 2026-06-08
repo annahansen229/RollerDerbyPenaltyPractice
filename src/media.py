@@ -24,6 +24,7 @@ def get_media() -> list[Media]:
             media_format = MediaFormat(parts[parts.index('static') + 1].removeprefix('s'))
             topic = None
             practice_format = None
+            cue = None
 
             if media_format == MediaFormat.VIDEO:
                 if "intro" in f.name:
@@ -36,6 +37,7 @@ def get_media() -> list[Media]:
 
             elif media_format == MediaFormat.IMAGE:
                 topic = Topic(f.parent.parent.name)
+                cue = f.stem.replace('_', ' ')
 
             media.append(
                 Media(
@@ -43,7 +45,8 @@ def get_media() -> list[Media]:
                     practice_format=practice_format,
                     topic=topic,
                     name=f.name,
-                    url=str(f)
+                    url=str(f),
+                    cue=cue
                 )
             )
 
