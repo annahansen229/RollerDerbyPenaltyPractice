@@ -4,12 +4,13 @@ from src.models import Option
 import dash_mantine_components as dmc
 
 
-class OptionPicker(dmc.AccordionItem):
+class IntroOutroPicker(dmc.AccordionItem):
     def __init__(self):
 
         super().__init__(
+            id='intro-outro-picker',
             children=[
-                dmc.AccordionControl('Other Options'),
+                dmc.AccordionControl('Include Intro/Outro'),
                 dmc.AccordionPanel(
                     dmc.CheckboxGroup(
                         id='options',
@@ -21,5 +22,6 @@ class OptionPicker(dmc.AccordionItem):
                     ),
                 )
             ],
-            value='options'
+            value='options',
+            hiddenFrom=None,
         )

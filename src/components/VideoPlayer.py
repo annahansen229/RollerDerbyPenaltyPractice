@@ -1,4 +1,3 @@
-from typing import Dict, List
 
 import dash_player as dp
 from dash import Input, Output, State, callback, dcc, html, no_update
@@ -6,9 +5,9 @@ from dash import Input, Output, State, callback, dcc, html, no_update
 from src.models import AppStore, Media
 
 
-class Player(html.Div):
+class VideoPlayer(html.Div):
     '''
-        Renders the Player component
+        Renders the VideoPlayer component
     '''
 
     def __init__(self, app_store: str, splash: str):
@@ -17,9 +16,9 @@ class Player(html.Div):
                 app_store (str): The identifier of the app_store component
                 splash (str): The identifier of the splash component
         '''
-        self.id = 'player'
+        self.id = 'video-player'
         self.video = 'video'
-        self.store = 'player_store'
+        self.store = 'video-player-store'
 
         super().__init__(
             id=self.id,
@@ -60,7 +59,7 @@ class Player(html.Div):
             ),
             prevent_initial_call=True
         )
-        def play_next_video(current_time: float, duration: float, url: None | str, playlist: List[Media]) -> Dict[str, Dict | bool]:
+        def play_next_video(current_time: float, duration: float, url: None | str, playlist: list[Media]) -> dict[str, dict | bool]:
             '''
                 When the current_time changes, check if the full video time has elapsed.
 

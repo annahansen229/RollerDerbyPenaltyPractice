@@ -1,7 +1,9 @@
 from .ContactForm import ContactForm
 from .NavBar import NavBar
-from .Player import Player
+from .VideoPlayer import VideoPlayer
 from .Splash import Splash
 from .ThemeToggle import ThemeToggle
+from .ImagePlayer import ImagePlayer
+from .PracticeContent import PracticeContent
 
-__all__ = ['Player', 'NavBar', 'ThemeToggle', 'Splash', 'ContactForm']
+__all__ = ['VideoPlayer', 'NavBar', 'ThemeToggle', 'Splash', 'ContactForm', 'ImagePlayer', 'PracticeContent']

@@ -5,12 +5,12 @@ from dash import Input, Output, State, callback, no_update
 from dash_iconify import DashIconify
 
 from .MediaFormatPicker import MediaFormatPicker
-from .OptionPicker import OptionPicker
+from .IntroOutroPicker import IntroOutroPicker
 from .PracticeFormatPicker import PracticeFormatPicker
 from .TopicPicker import TopicPicker
 from .PlaybackModePicker import PlaybackModePicker
 from src.media import get_playlist
-from src.components import Player
+from src.components import VideoPlayer
 from src.models import AppStore, PracticeFormat, Option, Topic, MediaFormat
 
 
@@ -19,12 +19,12 @@ class NavBar(dmc.AppShellNavbar):
         Renders the Options control component
 
         Args:
-            player (Player): The player component
+            player (VideoPlayer): The video player component
             contact_form (str): The identifier of the contact form component
             app_store (str): The identifier of the app store
     '''
 
-    def __init__(self, player: Player, contact_form: str, app_store: str):
+    def __init__(self, video_player: VideoPlayer, contact_form: str, app_store: str):
         self.contact_button_id = 'contact_button'
         self.start_button_id = 'start_button'
 
@@ -35,11 +35,11 @@ class NavBar(dmc.AppShellNavbar):
                     children=[
                         dmc.Accordion(
                             children=[
-                                MediaFormatPicker(),
-                                PlaybackModePicker(),
                                 PracticeFormatPicker(),
                                 TopicPicker(self.start_button_id),
-                                OptionPicker(),
+                                MediaFormatPicker(),
+                                IntroOutroPicker(),
+                                PlaybackModePicker(),
                             ],
                             multiple=True,
                             variant='contained',
@@ -70,9 +70,9 @@ class NavBar(dmc.AppShellNavbar):
 
         @callback(
             output=dict(
-                player_store=Output(player.store, 'data', allow_duplicate=True,),
+                player_store=Output(video_player.store, 'data', allow_duplicate=True,),
                 start_button_text=Output(self.start_button_id, 'children', allow_duplicate=True,),
-                url=Output(player.video, 'url', allow_duplicate=True, ),
+                url=Output(video_player.video, 'url', allow_duplicate=True, ),
                 mobile_burger=Output('mobile-burger', 'opened', allow_duplicate=True),
                 desktop_burger=Output('desktop-burger', 'opened', allow_duplicate=True),
                 app_store=Output(app_store, 'data', allow_duplicate=True)
@@ -101,14 +101,14 @@ class NavBar(dmc.AppShellNavbar):
                 url=first_entry['url'],
                 mobile_burger=False,
                 desktop_burger=False,
-                app_store=AppStore(active=player.id, last=None, finished=False),
+                app_store=AppStore(active=video_player.id, last=None, finished=False),
             )
 
         @callback(
             output=dict(
                 contact_button_text=Output(self.contact_button_id, 'children'),
                 app_store=Output(app_store, 'data', allow_duplicate=True),
-                playing=Output(player.video, 'playing', allow_duplicate=True)
+                playing=Output(video_player.video, 'playing', allow_duplicate=True)
             ),
             inputs=dict(
                 btn=Input(self.contact_button_id, 'n_clicks')
@@ -133,7 +133,7 @@ class NavBar(dmc.AppShellNavbar):
                         last=last,
                         finished=old_app_store.get('finished')
                     ),
-                    playing=False if last == player.id else no_update
+                    playing=False if last == video_player.id else no_update
                 )
 
             else:
@@ -145,5 +145,5 @@ class NavBar(dmc.AppShellNavbar):
                         last=contact_form,
                         finished=old_app_store.get('finished')
                     ),
-                    playing=True if active == player.id else no_update
+                    playing=True if active == video_player.id else no_update
                 )

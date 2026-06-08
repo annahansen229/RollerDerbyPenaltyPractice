@@ -6,7 +6,7 @@ import dash_mantine_components as dmc
 from dash import Dash, Input, Output, State, callback, dcc
 from dotenv import load_dotenv
 
-from src.components import ContactForm, NavBar, Player, Splash, ThemeToggle
+from src.components import ContactForm, NavBar, Splash, ThemeToggle, PracticeContent
 from src.models import AppStore
 
 load_dotenv()
@@ -19,7 +19,7 @@ app_store_id = 'app_store'
 
 splash = Splash(app_store=app_store_id)
 
-player = Player(app_store=app_store_id, splash=splash.id)
+practice_content = PracticeContent(app_store_id, splash.id)
 
 contact_form = ContactForm()
 
@@ -69,13 +69,13 @@ layout = dmc.AppShell(
             ),
         ),
         NavBar(
-            player=player,
+            video_player=practice_content.video_player,
             contact_form=contact_form.id,
             app_store=app_store_id
         ),
         dmc.AppShellMain([
             splash,
-            player,
+            practice_content,
             contact_form,
         ]),
         dmc.AppShellFooter(
@@ -141,7 +141,7 @@ def toggle_navbar(mobile_opened, desktop_opened, navbar):
     Input(app_store_id, 'data'),
     output=dict(
         splash_hidden=Output(splash.id, 'hidden'),
-        player_hidden=Output(player.id, 'hidden'),
+        player_hidden=Output(practice_content.video_player.id, 'hidden'),
         contact_form_hidden=Output(contact_form.id, 'hidden'),
     ),
     prevent_initial_call=True
@@ -150,7 +150,7 @@ def set_active_content(app_store: AppStore) -> Dict[str, bool]:
     active_id = app_store['active']
     return dict(
         splash_hidden=active_id != splash.id,
-        player_hidden=active_id != player.id,
+        player_hidden=active_id != practice_content.video_player.id,
         contact_form_hidden=active_id != contact_form.id
     )
 
