@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Dict, List, TypedDict
+from typing import TypedDict
 
 
 class Option(StrEnum):
@@ -10,11 +10,11 @@ class Option(StrEnum):
         return f'Include {self.title()}'
 
     @classmethod
-    def all(cls) -> List['Option']:
+    def all(cls) -> list['Option']:
         return [option for option in cls]
 
     @classmethod
-    def get_options(cls) -> List[Dict[str, str]]:
+    def get_options(cls) -> list[dict[str, str]]:
         '''
             Returns a list of Option options for an html input
         '''
@@ -28,11 +28,11 @@ class Topic(StrEnum):
     OTHER = 'other'
 
     @classmethod
-    def all(cls) -> List['Topic']:
+    def all(cls) -> list['Topic']:
         return [topic for topic in cls]
 
     @classmethod
-    def get_options(cls) -> List[Dict[str, str]]:
+    def get_options(cls) -> list[dict[str, str]]:
         '''
             Returns a list of Topic options for an html input component
         '''
@@ -44,7 +44,7 @@ class PlaybackMode(StrEnum):
     MANUAL = 'manual'
 
     @classmethod
-    def get_options(cls) -> List[Dict[str, str]]:
+    def get_options(cls) -> list[dict[str, str]]:
         '''
             Returns a list of PlaybackFormat options for an html input component
         '''
@@ -60,7 +60,7 @@ class MediaFormat(StrEnum):
     IMAGE = 'image'
 
     @classmethod
-    def get_options(cls) -> List[Dict[str, str]]:
+    def get_options(cls) -> list[dict[str, str]]:
         '''
             Returns a list of MediaFormat options for an html input component
         '''
@@ -77,11 +77,11 @@ class PracticeFormat(StrEnum):
     EXPRESSIVE = 'expressive'
 
     @classmethod
-    def all(cls) -> List['PracticeFormat']:
+    def all(cls) -> list['PracticeFormat']:
         return [format for format in cls]
 
     @classmethod
-    def get_options(cls) -> List[Dict[str, str]]:
+    def get_options(cls) -> list[dict[str, str]]:
         '''
             Returns a list of PracticeFormat options for an html input component
         '''
@@ -92,8 +92,9 @@ class PracticeFormat(StrEnum):
         return cls.BOTH
 
 
-class Clip(TypedDict):
-    format: PracticeFormat | None
+class Media(TypedDict):
+    practice_format: PracticeFormat | None
+    media_format: MediaFormat
     topic: Topic | None
     name: str
     url: str

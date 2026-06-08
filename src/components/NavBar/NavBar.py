@@ -9,9 +9,9 @@ from .OptionPicker import OptionPicker
 from .PracticeFormatPicker import PracticeFormatPicker
 from .TopicPicker import TopicPicker
 from .PlaybackModePicker import PlaybackModePicker
-from src.clips import get_playlist
+from src.media import get_playlist
 from src.components import Player
-from src.models import AppStore, PracticeFormat, Option, Topic
+from src.models import AppStore, PracticeFormat, Option, Topic, MediaFormat
 
 
 class NavBar(dmc.AppShellNavbar):
@@ -81,23 +81,24 @@ class NavBar(dmc.AppShellNavbar):
                 btn=Input(self.start_button_id, 'n_clicks')
             ),
             state=dict(
-                format=State('practice-format', 'value'),
+                media_format=State('media-format', 'value'),
+                practice_format=State('practice-format', 'value'),
                 topics=State('topics', 'value'),
                 options=State('options', 'value'),
             ),
             prevent_initial_call=True
         )
-        def start_button_click(format: PracticeFormat, topics: List[Topic], options: List[Option], **kwargs) -> Dict[str, Union[bool, str, Dict]]:
+        def start_button_click(media_format: MediaFormat, practice_format: PracticeFormat, topics: List[Topic], options: List[Option], **kwargs) -> Dict[str, Union[bool, str, Dict]]:
             '''
                 When the start button is clicked, get the playlist based on the selected options, and
-                set the store contents and url of the first video
+                set the store contents and url of the first entry
             '''
-            first_video, *remaining_playlist = get_playlist(format, topics, options)
+            first_entry, *remaining_playlist = get_playlist(media_format, practice_format, topics, options)
 
             return dict(
                 player_store=remaining_playlist,
                 start_button_text='Restart',
-                url=first_video['url'],
+                url=first_entry['url'],
                 mobile_burger=False,
                 desktop_burger=False,
                 app_store=AppStore(active=player.id, last=None, finished=False),

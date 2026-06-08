@@ -3,7 +3,7 @@ from typing import Dict, List
 import dash_player as dp
 from dash import Input, Output, State, callback, dcc, html, no_update
 
-from src.models import AppStore, Clip
+from src.models import AppStore, Media
 
 
 class Player(html.Div):
@@ -60,7 +60,7 @@ class Player(html.Div):
             ),
             prevent_initial_call=True
         )
-        def play_next_video(current_time: float, duration: float, url: None | str, playlist: List[Clip]) -> Dict[str, Dict | bool]:
+        def play_next_video(current_time: float, duration: float, url: None | str, playlist: List[Media]) -> Dict[str, Dict | bool]:
             '''
                 When the current_time changes, check if the full video time has elapsed.
 
