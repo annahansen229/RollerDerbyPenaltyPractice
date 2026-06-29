@@ -1,8 +1,8 @@
 
 import dash_player as dp
-from dash import Input, Output, State, callback, dcc, html, no_update
+from dash import Input, Output, State, callback, html, no_update, ctx
 
-from src.models import AppStore, Media
+from src.models import AppStore
 
 
 class VideoPlayer(html.Div):
@@ -10,7 +10,7 @@ class VideoPlayer(html.Div):
         Renders the VideoPlayer component
     '''
 
-    def __init__(self, app_store: str, splash: str):
+    def __init__(self, app_store_id: str, splash: str):
         '''
             Args:
                 app_store (str): The identifier of the app_store component
@@ -24,7 +24,6 @@ class VideoPlayer(html.Div):
             id=self.id,
             hidden=True,
             children=[
-                dcc.Store(id=self.store, storage_type='session', data=[]),
                 dp.DashPlayer(
                     id=self.video,
                     url=None,
@@ -38,16 +37,25 @@ class VideoPlayer(html.Div):
 
         @callback(
             Output(self.video, 'playing'),
-            Input(self.video, 'url')
+            Input(self.video, 'url'),
+            Input(app_store_id, 'data.playing'),
         )
-        def toggle_playing(url: str) -> bool:
-            return bool(url)
+        def toggle_playing(url: str, app_store_playing: bool) -> bool:
+            '''
+                Toggles the playing state when the url is set or cleared, and when the app_store playing state changes    
+            '''
+            trigger_id = ctx.triggered_id
+
+            if trigger_id == self.video:
+                return bool(url)
+
+            if trigger_id == app_store_id:
+                return app_store_playing
 
         @callback(
             output=dict(
-                url=Output(self.video, 'url', allow_duplicate=True,),
-                new_playlist=Output(self.store, 'data', allow_duplicate=True),
-                app_store=Output(app_store, 'data', allow_duplicate=True),
+                player_url=Output(self.video, 'url', allow_duplicate=True,),
+                app_store=Output(app_store_id, 'data', allow_duplicate=True),
             ),
             inputs=dict(
                 current_time=Input(self.video, 'currentTime'),
@@ -55,38 +63,53 @@ class VideoPlayer(html.Div):
             state=dict(
                 duration=State(self.video, 'duration'),
                 url=State(self.video, 'url'),
-                playlist=State(self.store, 'data')
+                app_store=State(app_store_id, 'data')
             ),
             prevent_initial_call=True
         )
-        def play_next_video(current_time: float, duration: float, url: None | str, playlist: list[Media]) -> dict[str, dict | bool]:
+        def play_next_video(current_time: float, duration: float, old_player_url: None | str, old_app_store: AppStore) -> dict[str, dict | bool]:
             '''
                 When the current_time changes, check if the full video time has elapsed.
 
-                If so, and the store has items remaining, set the next video url and advance the playlist
+                If so, and the playlist has items remaining, set the next video url and advance the playlist
 
-                If the store is empty, clear the video url and the playlist
+                If the playlist is empty, clear the video url and the playlist
 
                 If the full video time has not yet elapsed, do nothing.
             '''
-            new_url = no_update
-            new_playlist = no_update
+            player_url = no_update
             app_store = no_update
 
-            if current_time == duration and url is not None:
+            if current_time == duration and old_player_url is not None:
                 # video has reached the end
                 try:
-                    next_video, *remaining_playlist = playlist
-                    new_url = next_video['url']
+                    next_video, *remaining_playlist = old_app_store.get('playlist', [])
+                    player_url = next_video['url']
                     new_playlist = remaining_playlist
+
+                    app_store_updates = dict(
+                        playlist=new_playlist,
+                        url=player_url,
+                    )
+
+                    app_store = AppStore(
+                        **old_app_store,
+                        **app_store_updates
+                    )
+
                 except ValueError:
                     # end of the playlist
-                    new_url = None
-                    new_playlist = []
-                    app_store = AppStore(active=splash, last=None, finished=True)
+                    player_url = None
+                    app_store = AppStore(
+                        playlist=[],
+                        url=player_url,
+                        playing=False,
+                        active=splash,
+                        last=None,
+                        finished=True
+                    )
 
             return dict(
-                url=new_url,
-                new_playlist=new_playlist,
+                player_url=player_url,
                 app_store=app_store,
             )

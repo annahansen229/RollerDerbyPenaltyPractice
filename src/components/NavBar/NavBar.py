@@ -1,7 +1,7 @@
 from typing import Dict, List, Union
 
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, no_update
+from dash import Input, Output, State, callback
 from dash_iconify import DashIconify
 
 from .MediaFormatPicker import MediaFormatPicker
@@ -10,7 +10,7 @@ from .PracticeFormatPicker import PracticeFormatPicker
 from .TopicPicker import TopicPicker
 from .PlaybackModePicker import PlaybackModePicker
 from src.media import get_playlist
-from src.components import VideoPlayer
+from src.components import PracticeContent
 from src.models import AppStore, PracticeFormat, Option, Topic, MediaFormat
 
 
@@ -24,7 +24,7 @@ class NavBar(dmc.AppShellNavbar):
             app_store (str): The identifier of the app store
     '''
 
-    def __init__(self, video_player: VideoPlayer, contact_form: str, app_store: str):
+    def __init__(self, practice_content: PracticeContent, contact_form: str, app_store: str):
         self.contact_button_id = 'contact_button'
         self.start_button_id = 'start_button'
 
@@ -70,9 +70,7 @@ class NavBar(dmc.AppShellNavbar):
 
         @callback(
             output=dict(
-                player_store=Output(video_player.store, 'data', allow_duplicate=True,),
                 start_button_text=Output(self.start_button_id, 'children', allow_duplicate=True,),
-                url=Output(video_player.video, 'url', allow_duplicate=True, ),
                 mobile_burger=Output('mobile-burger', 'opened', allow_duplicate=True),
                 desktop_burger=Output('desktop-burger', 'opened', allow_duplicate=True),
                 app_store=Output(app_store, 'data', allow_duplicate=True)
@@ -96,19 +94,22 @@ class NavBar(dmc.AppShellNavbar):
             first_entry, *remaining_playlist = get_playlist(media_format, practice_format, topics, options)
 
             return dict(
-                player_store=remaining_playlist,
                 start_button_text='Restart',
-                url=first_entry['url'],
                 mobile_burger=False,
                 desktop_burger=False,
-                app_store=AppStore(active=video_player.id, last=None, finished=False),
+                app_store=AppStore(
+                    playlist=remaining_playlist,
+                    url=first_entry['url'],
+                    active=practice_content.id,
+                    last=None,
+                    finished=False
+                ),
             )
 
         @callback(
             output=dict(
                 contact_button_text=Output(self.contact_button_id, 'children'),
                 app_store=Output(app_store, 'data', allow_duplicate=True),
-                playing=Output(video_player.video, 'playing', allow_duplicate=True)
             ),
             inputs=dict(
                 btn=Input(self.contact_button_id, 'n_clicks')
@@ -125,25 +126,35 @@ class NavBar(dmc.AppShellNavbar):
                 pauses playback if mid-session
             '''
             if currently_hidden:
+                contact_button_text = 'Close Contact Form',
+
                 last = old_app_store.get('active')
-                return dict(
-                    contact_button_text='Close Contact Form',
-                    app_store=AppStore(
-                        active=contact_form,
-                        last=last,
-                        finished=old_app_store.get('finished')
-                    ),
-                    playing=False if last == video_player.id else no_update
+
+                updates = dict(
+                    active=contact_form,
+                    last=last,
                 )
 
+                if last == practice_content.id:
+                    updates['playing'] = False
+
             else:
+                contact_button_text = 'Contact Us',
+
                 active = old_app_store.get('last')
-                return dict(
-                    contact_button_text='Contact Us',
-                    app_store=AppStore(
-                        active=active,
-                        last=contact_form,
-                        finished=old_app_store.get('finished')
-                    ),
-                    playing=True if active == video_player.id else no_update
+
+                updates = dict(
+                    active=active,
+                    last=contact_form,
                 )
+
+                if active == practice_content.id:
+                    updates['playing'] = True
+
+            return dict(
+                contact_button_text=contact_button_text,
+                app_store=AppStore(
+                    **old_app_store,
+                    **updates,
+                ),
+            )

@@ -102,6 +102,9 @@ class Media(TypedDict):
 
 
 class AppStore(TypedDict):
+    playlist: list[Media]
+    url: str | None
+    playing: bool
     active: str
     last: str | None
     finished: bool

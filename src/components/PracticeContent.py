@@ -19,7 +19,7 @@ class PracticeContent(html.Div):
 
         self.id = 'practice-content'
 
-        video_player = VideoPlayer(app_store=app_store, splash=splash)
+        video_player = VideoPlayer(app_store_id=app_store, splash=splash)
         image_player = ImagePlayer()
 
         self.video_player = video_player
