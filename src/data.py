@@ -76,6 +76,8 @@ data = {
             'code': 'G',
             'alternate cues': ['Insubordination']
         },
+        {'cue': 'Two Penalties'},
+        {'cue': 'Report to the Box'},
     ],
     Topic.PACK: [
         {'cue': 'No Pack'},
@@ -85,11 +87,9 @@ data = {
     Topic.OTHER: [
         {'cue': 'Official Review'},
         {'cue': 'Official Timeout'},
-        {'cue': 'Report to the Box'},
         {'cue': 'Return to the Track'},
         {'cue': 'Return to your Bench'},
         {'cue': 'Team Timeout'},
-        {'cue': 'Two Penalties'},
     ],
     Topic.JAMMER: [
         {'cue': 'Jam Ending'},

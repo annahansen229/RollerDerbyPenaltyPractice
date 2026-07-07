@@ -42,7 +42,7 @@ class Splash(html.Div):
                                 dmc.Text(children=[
                                     dmc.Text('Choose ', span=True,),
                                     dmc.Text('Expressive Format', span=True, c='grape', inherit=True,),
-                                    ' to hear and see the verbal cue, and then perform the correct hand signal.'
+                                    ' to see the verbal cue, and then perform the correct hand signal.'
                                 ]),
                                 dmc.Text(children=[
                                     dmc.Text('Choose ', span=True,),
@@ -91,14 +91,9 @@ class Splash(html.Div):
                                     fw=500,
                                 ),
                                 dmc.Text(children=[
-                                    'Include the ',
-                                    dmc.Text('Intro', span=True, c='grape', inherit=True,),
-                                    ' to hear a brief verbal explanation of how this practice works.'
-                                ]),
-                                dmc.Text(children=[
-                                    'Include the ',
-                                    dmc.Text('Outro', span=True, c='grape', inherit=True,),
-                                    ' to hear some parting words after you have completed practice.'
+                                    'Use the ',
+                                    dmc.Text('Playback Controls', span=True, c='grape', inherit=True,),
+                                    ' to adjust the amount of time the images and text are displayed on the screen.'
                                 ]),
                             ],
                             inheritPadding=True,
@@ -109,7 +104,7 @@ class Splash(html.Div):
                                 dmc.Text(children=[
                                     'When you click ',
                                     dmc.Text('Start', span=True, c='grape', inherit=True,),
-                                    ' all the clips for your selected topics will be shuffled and played for you in a random order.'
+                                    ' all the content for your selected topics will be shuffled and played for you in a random order.'
                                 ]),
                                 dmc.Text(children=[
                                     'Click ',
