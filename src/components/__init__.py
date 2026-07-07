@@ -1,7 +1,7 @@
 from .ContactForm import ContactForm
+from .Content import Content
 from .NavBar import NavBar
-from .Player import Player
 from .Splash import Splash
 from .ThemeToggle import ThemeToggle
 
-__all__ = ['Player', 'NavBar', 'ThemeToggle', 'Splash', 'ContactForm']
+__all__ = ['NavBar', 'ThemeToggle', 'Splash', 'ContactForm', 'Content']

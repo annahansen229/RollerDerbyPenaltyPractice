@@ -12,7 +12,7 @@ class Splash(html.Div):
         Renders the Welcome component.
     '''
 
-    def __init__(self, app_store: str):
+    def __init__(self, app_store_id: str):
         '''
             Args:
                 app_store (str): The identifier of the app store component
@@ -184,7 +184,7 @@ class Splash(html.Div):
         )
 
         @callback(
-            Input(app_store, 'data'),
+            Input(app_store_id, 'data'),
             output=dict(
                 welcome_open=Output(self.welcome, 'opened', allow_duplicate=True),
                 finished_open=Output(self.finished, 'opened', allow_duplicate=True),
