@@ -6,7 +6,7 @@ import dash_mantine_components as dmc
 from dash import Dash, Input, Output, State, callback, dcc
 from dotenv import load_dotenv
 
-from src.components import ContactForm, NavBar, Player, Splash, ThemeToggle
+from src.components import ContactForm, Content, NavBar, Splash, ThemeToggle
 from src.models import AppStore
 
 load_dotenv()
@@ -16,12 +16,27 @@ app = Dash(__name__, title='Roller Derby Penalty Practice')
 server = app.server
 
 app_store_id = 'app_store'
+content_id = 'content'
+interval_id = 'content_interval'
 
-splash = Splash(app_store=app_store_id)
-
-player = Player(app_store=app_store_id, splash=splash.id)
+splash = Splash(app_store_id=app_store_id)
 
 contact_form = ContactForm()
+
+nav_bar = NavBar(
+    content_id=content_id,
+    interval_id=interval_id,
+    contact_form_id=contact_form.id,
+    app_store_id=app_store_id
+)
+
+content = Content(
+    id=content_id,
+    interval_id=interval_id,
+    app_store_id=app_store_id,
+    splash_id=splash.id,
+    nav_bar=nav_bar
+)
 
 layout = dmc.AppShell(
     [
@@ -68,31 +83,13 @@ layout = dmc.AppShell(
                 px="md",
             ),
         ),
-        NavBar(
-            player=player,
-            contact_form=contact_form.id,
-            app_store=app_store_id
-        ),
+        nav_bar,
+
         dmc.AppShellMain([
             splash,
-            player,
+            content,
             contact_form,
         ]),
-        dmc.AppShellFooter(
-            dmc.Text(children=[
-                'Thank you to ',
-                dmc.Anchor(
-                    "Axis of Stevil",
-                    href="https://www.youtube.com/feed/subscriptions/UCgxwwxOVwKbMNmivt-ImKJQ",
-                    c='grape'
-                ),
-                ', who graciously allowed me to use his video content to create this app.',
-            ]
-            ),
-            px="md",
-            display='flex',
-            style={'align-items': 'center'},
-        )
     ],
     header={
         "height": 60,
@@ -141,7 +138,7 @@ def toggle_navbar(mobile_opened, desktop_opened, navbar):
     Input(app_store_id, 'data'),
     output=dict(
         splash_hidden=Output(splash.id, 'hidden'),
-        player_hidden=Output(player.id, 'hidden'),
+        content_hidden=Output(content.id, 'hidden'),
         contact_form_hidden=Output(contact_form.id, 'hidden'),
     ),
     prevent_initial_call=True
@@ -150,7 +147,7 @@ def set_active_content(app_store: AppStore) -> Dict[str, bool]:
     active_id = app_store['active']
     return dict(
         splash_hidden=active_id != splash.id,
-        player_hidden=active_id != player.id,
+        content_hidden=active_id != content.id,
         contact_form_hidden=active_id != contact_form.id
     )
 

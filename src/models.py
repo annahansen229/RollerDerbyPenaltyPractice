@@ -2,25 +2,6 @@ from enum import StrEnum
 from typing import Dict, List, TypedDict
 
 
-class Option(StrEnum):
-    INTRO = 'intro'
-    OUTRO = 'outro'
-
-    def label(self) -> str:
-        return f'Include {self.title()}'
-
-    @classmethod
-    def all(cls) -> List['Option']:
-        return [option for option in cls]
-
-    @classmethod
-    def get_options(cls) -> List[Dict[str, str]]:
-        '''
-            Returns a list of Option options for an html input
-        '''
-        return [{'label': option.label(), 'value': option} for option in cls]
-
-
 class Topic(StrEnum):
     PENALTIES = 'penalties'
     PACK = 'pack'
@@ -64,6 +45,16 @@ class Clip(TypedDict):
     format: Format | None
     topic: Topic | None
     name: str
+    url: str
+
+
+class Media(TypedDict):
+    topic: Topic
+    format: Format
+    rule: Dict[str, str] | None
+    code: str | None
+    cue: str
+    alternate_cues: list[str] | None
     url: str
 
 
